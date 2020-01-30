@@ -9,7 +9,7 @@ public class Logic3T {
         this.table = table;
     }
 
-    public boolean fillBy(Predicate<Figure3T> predicate, int startX, int startY, int deltaX, int deltaY) {
+    private boolean fillBy(Predicate<Figure3T> predicate, int startX, int startY, int deltaX, int deltaY) {
         boolean result = true;
         for (int index = 0; index != this.table.length; index++) {
             Figure3T cell = this.table[startX][startY];
@@ -23,21 +23,62 @@ public class Logic3T {
         return result;
     }
 
+    private boolean horizontalLineWin(Predicate<Figure3T> predicate) {
+        boolean result = false;
+        for (int i = 0; i < this.table.length; i++) {
+            if(this.fillBy(predicate, 0, i, 1, 0)) {
+               result = true;
+               break;
+            }
+        }
+        return result;
+    }
+
+    private boolean verticalLineWin(Predicate<Figure3T> predicate) {
+        boolean result = false;
+        for (int i = 0; i < this.table.length; i++) {
+            if(this.fillBy(predicate, i, 0, 0, 1)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    private boolean diagonalLineWin(Predicate<Figure3T> predicate) {
+        boolean result = false;
+        if(this.fillBy(predicate, 0, 0, 1, 1) ||
+                 this.fillBy(predicate, this.table.length - 1, 0, -1, 1)) {
+            result = true;
+        }
+        return result;
+    }
+
     public boolean isWinnerX() {
-        return this.fillBy(Figure3T::hasMarkX, 0, 0, 1, 0) ||
-                this.fillBy(Figure3T::hasMarkX, 0, 0, 0, 1) ||
-                this.fillBy(Figure3T::hasMarkX, 0,0, 1, 1) ||
-                this.fillBy(Figure3T::hasMarkX, this.table.length - 1 , 0, -1, 1);
+        return  horizontalLineWin(Figure3T::hasMarkX)  ||
+                    verticalLineWin(Figure3T::hasMarkX)  ||
+                        diagonalLineWin(Figure3T::hasMarkX);
+
     }
 
     public boolean isWinnerO() {
-        return this.fillBy(Figure3T::hasMarkO, 0, 0, 1, 0) ||
-                this.fillBy(Figure3T::hasMarkO, 0, 0, 0, 1) ||
-                this.fillBy(Figure3T::hasMarkO, 0,0, 1, 1) ||
-                this.fillBy(Figure3T::hasMarkO, this.table.length - 1, 0, -1, 1);
+        return  horizontalLineWin(Figure3T::hasMarkO)  ||
+                    verticalLineWin(Figure3T::hasMarkO)  ||
+                        diagonalLineWin(Figure3T::hasMarkO);
+
     }
 
     public boolean hasGap() {
-        return true;
+        boolean result = false;
+        for (Figure3T[] row : table) {
+            for(Figure3T cell : row) {
+                if(!cell.hasMarkO() && !cell.hasMarkX()) {
+                    result = true;
+                    break;
+                }
+
+            }
+        }
+        return result;
     }
 }
